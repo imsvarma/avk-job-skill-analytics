@@ -15,7 +15,7 @@ from datetime import datetime
 import os
 openai.api_key = os.getenv("OPENAI_API_KEY")  # 🔒 Load key from environment
 
-NUM_JOBS = 10               # total output size
+NUM_JOBS = 500               # total output size
 KAGGLE_SHARE = 0.7          # 70% Kaggle, 30% HuggingFace
 COUNTRY_FILTER = ["usa", "us", "united states"]
 
