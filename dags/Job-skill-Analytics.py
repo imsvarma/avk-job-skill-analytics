@@ -26,8 +26,11 @@ with DAG(
 
     run_extract_script = BashOperator(
     task_id="run_extract_script",
-    bash_command="python /opt/airflow/dags/repo/src/extract.py"
-)
+    bash_command=("pip install -r /opt/airflow/dags/repo/requirements.txt --quiet && "
+                  "python /opt/airflow/dags/repo/src/extract.py"
+                  "pip install -r /opt/airflow/dags/repo/requirements.txt --quiet && "
+                  )
+)   
 
     
 
