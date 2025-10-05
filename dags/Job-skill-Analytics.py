@@ -2,36 +2,59 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from datetime import datetime, timedelta
 
+# =========================================================
+# ⚙️ Default Configuration
+# =========================================================
 default_args = {
     'owner': 'mani',
     'depends_on_past': False,
     'retries': 1,
-    'retry_delay': timedelta(minutes=2),
+    'retry_delay': timedelta(minutes=3),
 }
 
+# =========================================================
+# 📅 DAG Definition
+# =========================================================
 with DAG(
     dag_id="extract_job_pipeline_dag",
     default_args=default_args,
-    description="Run extract.py to fetch, process, and upload job data to S3",
-    schedule_interval="@daily",
+    description="ETL job that runs extract.py and validates environment variables",
+    schedule_interval="@daily",       # or None for manual
     start_date=datetime(2025, 10, 5),
     catchup=False,
-    tags=["etl", "s3", "python-script"]
+    tags=["etl", "aws", "openai", "env-check"]
 ) as dag:
 
-    precheck = BashOperator(
-        task_id="check_environment",
-        bash_command="echo '✅ Environment ready — running ETL...'"
+    # ---------- ✅ TASK 1: Verify environment variables ----------
+    check_env = BashOperator(
+        task_id="check_env_vars",
+        bash_command="""
+        echo "🔍 Checking Environment Variables..."
+        echo "OPENAI_API_KEY: ${OPENAI_API_KEY:0:8}********"
+        echo "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:0:4}********"
+        echo "AWS_REGION: ${AWS_DEFAULT_REGION}"
+        """,
     )
 
-run_extract_script = BashOperator(
-    task_id="run_extract_script",
-    bash_command="pip install -r /opt/airflow/dags/repo/requirements.txt --quiet && python /opt/airflow/dags/repo/src/extract.py"
-)
+    # ---------- TASK 2: Install dependencies ----------
+    install_deps = BashOperator(
+        task_id="install_dependencies",
+        bash_command="pip install -r /opt/airflow/dags/repo/requirements.txt --quiet"
+    )
 
-verify = BashOperator(
-    task_id="verify_upload",
-    bash_command="echo '✅ ETL completed — check S3 for output.'"
-)
+    # ---------- TASK 3: Run extract.py ----------
+    run_extract = BashOperator(
+        task_id="run_extract_script",
+        bash_command="python /opt/airflow/dags/repo/src/extract.py"
+    )
 
-precheck >> run_extract_script >> verify
+    # ---------- TASK 4: Post verification ----------
+    post_check = BashOperator(
+        task_id="post_check",
+        bash_command="echo '✅ DAG finished successfully — check S3 and logs!'"
+    )
+
+    # =========================================================
+    # 🔁 TASK ORDER
+    # =========================================================
+    check_env >> install_deps >> run_extract >> post_check
