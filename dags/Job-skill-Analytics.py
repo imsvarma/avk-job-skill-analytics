@@ -16,10 +16,10 @@ default_args = {
 # 📅 DAG Definition
 # =========================================================
 with DAG(
-    dag_id="jo",
+    dag_id="extract_job_pipeline_dag",
     default_args=default_args,
-    description="Run New_Test.py to fetch, process, and upload job data to S3",
-    schedule_interval="@daily",       # run daily; set to None for manual
+    description="Run extract.py to fetch, process, and upload job data to S3",
+    schedule_interval="@daily",        # daily; set to None for manual run
     start_date=datetime(2025, 10, 5),
     catchup=False,
     tags=["etl", "s3", "python-script"]
@@ -28,13 +28,13 @@ with DAG(
     # ---------- TASK 1: Pre-check ----------
     precheck = BashOperator(
         task_id="check_environment",
-        bash_command="echo '✅ Environment verified — starting job pipeline...'"
+        bash_command="echo '✅ Environment verified — starting extract pipeline...'"
     )
 
-    # ---------- TASK 2: Execute main Python script ----------
+    # ---------- TASK 2: Execute main Python ETL ----------
     run_script = BashOperator(
-        task_id="run_new_test_script",
-        bash_command="python /opt/airflow/dags/New_Test.py"
+        task_id="run_extract_script",
+        bash_command="python /opt/airflow/dags/extract.py"
     )
 
     # ---------- TASK 3: Post-run verification ----------
