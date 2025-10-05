@@ -12,9 +12,9 @@ import openai
 from datetime import datetime
 
 # ---------- CONFIG ----------
-openai.api_key = "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"   # 🔑 Add your key here
-ARCHIVE_PATH = "archive"
-EXPORT_PATH = "daily_exports"
+import os
+openai.api_key = os.getenv("OPENAI_API_KEY")  # 🔒 Load key from environment
+
 NUM_JOBS = 10               # total output size
 KAGGLE_SHARE = 0.7          # 70% Kaggle, 30% HuggingFace
 COUNTRY_FILTER = ["usa", "us", "united states"]
@@ -25,29 +25,37 @@ def progress_bar(stage, total_stages):
     bar = "█" * (percent // 5) + "-" * (20 - percent // 5)
     print(f"[{bar}] {percent}% - Step {stage}/{total_stages}")
 
-# ---------- STEP 1: Load Kaggle dataset (.csv or .xlsx) ----------
-print("📂 Loading Kaggle dataset...")
+# ---------- STEP 1: Load Kaggle dataset from S3 ----------
+print("📂 Loading Kaggle dataset from AWS S3...")
 progress_bar(1, 7)
 
-kaggle_files = [
-    os.path.join(ARCHIVE_PATH, f)
-    for f in os.listdir(ARCHIVE_PATH)
-    if f.endswith((".csv", ".xlsx"))
-]
-if not kaggle_files:
-    raise FileNotFoundError(f"❌ No files in {os.path.abspath(ARCHIVE_PATH)}")
+import boto3
+import io
+
+s3 = boto3.client("s3")
+bucket_name = "job-skill-analytics"
+prefix = "kaggle/"  # folder inside your bucket (s3://job-skill-analytics/datasets/)
+
+# List all CSV/XLSX objects under that prefix
+response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+
+if "Contents" not in response:
+    raise FileNotFoundError(f"❌ No files found in s3://{bucket_name}/{prefix}")
 
 frames = []
-for f in kaggle_files:
-    print(f"📄 Reading {os.path.basename(f)} ...")
-    if f.endswith(".csv"):
-        frames.append(pd.read_csv(f, low_memory=False))
-    else:
-        frames.append(pd.read_excel(f))
-kaggle_df = pd.concat(frames, ignore_index=True)
-print(f"✅ Kaggle loaded: {len(kaggle_df)} rows, {len(kaggle_df.columns)} columns")
+for obj in response["Contents"]:
+    key = obj["Key"]
+    if key.endswith((".csv", ".xlsx")):
+        print(f"📄 Reading {key} ...")
+        s3_obj = s3.get_object(Bucket=bucket_name, Key=key)
+        if key.endswith(".csv"):
+            frames.append(pd.read_csv(io.BytesIO(s3_obj["Body"].read()), low_memory=False))
+        else:
+            frames.append(pd.read_excel(io.BytesIO(s3_obj["Body"].read())))
 
-# ---------- STEP 2: Load Hugging Face dataset ----------
+# Combine all files into one DataFrame
+kaggle_df = pd.concat(frames, ignore_index=True)
+print(f"✅ Kaggle loaded from S3: {len(kaggle_df)} rows, {len(kaggle_df.columns)} columns")
 progress_bar(2, 7)
 print("📥 Loading Hugging Face dataset...")
 try:
