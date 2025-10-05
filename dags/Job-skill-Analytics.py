@@ -24,14 +24,16 @@ with DAG(
         bash_command="echo '✅ Environment ready — running ETL...'"
     )
 
-    run_extract = BashOperator(
-        task_id="run_extract_script",
-        bash_command="python /opt/airflow/src/extract.py"
-    )
+    run_extract_script = BashOperator(
+    task_id="run_extract_script",
+    bash_command="python /opt/airflow/dags/repo/src/extract.py"
+)
+
+    
 
     verify = BashOperator(
         task_id="verify_upload",
         bash_command="echo '✅ ETL completed — check S3 for output.'"
     )
 
-    precheck >> run_extract >> verify
+    precheck >> run_extract_script >> verify
