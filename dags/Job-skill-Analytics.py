@@ -16,7 +16,7 @@ default_args = {
 # 📅 DAG Definition
 # =========================================================
 with DAG(
-    dag_id="job_skill_analytics_pipeline",
+    dag_id="jo",
     default_args=default_args,
     description="Run New_Test.py to fetch, process, and upload job data to S3",
     schedule_interval="@daily",       # run daily; set to None for manual
