@@ -34,7 +34,7 @@ import io
 
 s3 = boto3.client("s3")
 bucket_name = "job-skill-analytics"
-prefix = "kaggle/"  # folder inside your bucket (s3://job-skill-analytics/datasets/)
+prefix = "kaggle_dataset/"  # folder inside your bucket (s3://job-skill-analytics/datasets/)
 
 # List all CSV/XLSX objects under that prefix
 response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
@@ -232,7 +232,6 @@ s3.put_object(
     Bucket=bucket_name,
     Key=s3_key,
     Body=csv_buffer.getvalue(),
-    ACL="public-read",      # makes it publicly accessible
     ContentType="text/csv"
 )
 
