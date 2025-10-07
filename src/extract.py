@@ -218,8 +218,8 @@ from datetime import datetime
 
 # AWS S3 configuration
 bucket_name = "job-skill-analytics"
-date_str = datetime.now().strftime("%Y-%m-%d")
-file_name = f"fetch_jobs_{date_str}.csv"
+timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+file_name = f"fetch_jobs_{timestamp}.csv"
 s3_key = f"extract/raw/{file_name}"
 
 # Convert DataFrame to CSV in memory
