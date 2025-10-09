@@ -1,0 +1,18 @@
+2025-10-08 12:11:13,130 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 12:11:13,976 - INFO - No new files found.
+2025-10-08 12:14:24,832 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 12:14:25,585 - INFO - No new files found.
+2025-10-08 12:17:49,124 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 12:17:49,868 - INFO - No new files found.
+2025-10-08 12:20:31,148 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 12:20:32,037 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-08_00-16-28_00.csv
+2025-10-08 12:20:32,732 - INFO - \u2705 Uploaded processed file: extract/processed/fetch_jobs_2025-10-08_00-16-28_00.csv
+2025-10-08 12:21:23,739 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 12:21:25,180 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-08_00-16-28_00.csv
+2025-10-08 12:21:26,148 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-08_00-16-28_00.csv
+2025-10-08 13:25:22,785 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 13:25:23,850 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-01.csv
+2025-10-08 13:25:24,632 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-01.csv
+2025-10-08 14:03:21,736 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 14:03:22,896 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-02.csv
+2025-10-08 14:03:24,187 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-02.csv

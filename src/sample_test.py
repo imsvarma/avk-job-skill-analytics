@@ -6,18 +6,25 @@ Created on Sat Oct  4 03:39:10 2025
 """
 
 import pandas as pd
-import os, re, time
+import os, re, time, random
 from tqdm import tqdm
 import openai
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # ---------- CONFIG ----------
 import os
 openai.api_key = os.getenv("OPENAI_API_KEY")  # 🔒 Load key from environment
 
-NUM_JOBS = 2000              # total output size
-KAGGLE_SHARE = 0.7          # 70% Kaggle, 30% HuggingFace
+NUM_JOBS = 1670             # total output size
+KAGGLE_SHARE = 0.7           # 70% Kaggle, 30% HuggingFace
 COUNTRY_FILTER = ["usa", "us", "united states"]
+
+# ---------- MANUAL JOB DATE ----------
+# 👇 Set the desired date here manually
+MANUAL_DATE = "2025-10-03"  # YYYY-MM-DD format
+
+# 💡 In the future, to automatically use today's date, just replace with:
+# MANUAL_DATE = datetime.now().strftime("%Y-%m-%d")
 
 # ---------- UTILITIES ----------
 def progress_bar(stage, total_stages):
@@ -34,9 +41,8 @@ import io
 
 s3 = boto3.client("s3")
 bucket_name = "job-skill-analytics"
-prefix = "kaggle_dataset/"  # folder inside your bucket (s3://job-skill-analytics/datasets/)
+prefix = "kaggle_dataset/"
 
-# List all CSV/XLSX objects under that prefix
 response = s3.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
 
 if "Contents" not in response:
@@ -53,10 +59,11 @@ for obj in response["Contents"]:
         else:
             frames.append(pd.read_excel(io.BytesIO(s3_obj["Body"].read())))
 
-# Combine all files into one DataFrame
 kaggle_df = pd.concat(frames, ignore_index=True)
 print(f"✅ Kaggle loaded from S3: {len(kaggle_df)} rows, {len(kaggle_df.columns)} columns")
 progress_bar(2, 7)
+
+# ---------- STEP 2: Load Hugging Face dataset ----------
 print("📥 Loading Hugging Face dataset...")
 try:
     from datasets import load_dataset
@@ -84,13 +91,13 @@ kaggle_df = filter_usa(kaggle_df, "country" if "country" in kaggle_df.columns el
 hf_df = filter_usa(hf_df, "job_country", "job_location")
 print(f"✅ Kaggle after filter: {len(kaggle_df)} | Hugging Face: {len(hf_df)}")
 
-# ---------- STEP 4: Random Sampling (70/30 split) ----------
+# ---------- STEP 4: Random Sampling ----------
 progress_bar(4, 7)
 kaggle_sample = kaggle_df.sample(int(NUM_JOBS * KAGGLE_SHARE), random_state=42)
 hf_sample = hf_df.sample(NUM_JOBS - len(kaggle_sample), random_state=42)
 print(f"🎲 Sampling {len(kaggle_sample)} Kaggle + {len(hf_sample)} Hugging Face")
 
-# ---------- STEP 5: AI Skill Extraction from Description ----------
+# ---------- STEP 5: AI Skill Extraction ----------
 progress_bar(5, 7)
 print("🧠 Extracting technical & soft skills using AI...")
 
@@ -125,7 +132,6 @@ def extract_skills(text):
 
 tqdm.pandas()
 
-# Kaggle → use description column
 desc_col_kaggle = "description" if "description" in kaggle_sample.columns else None
 if desc_col_kaggle:
     kaggle_sample[["technical_skills", "soft_skills"]] = kaggle_sample[desc_col_kaggle].progress_apply(
@@ -134,13 +140,11 @@ if desc_col_kaggle:
 else:
     kaggle_sample["technical_skills"], kaggle_sample["soft_skills"] = "", ""
 
-# Hugging Face → use job_type_skills / job_skills as text
 desc_col_hf = "job_type_skills" if "job_type_skills" in hf_sample.columns else "job_skills"
 hf_sample[["technical_skills", "soft_skills"]] = hf_sample[desc_col_hf].progress_apply(
     lambda x: pd.Series(extract_skills(str(x)))
 )
 
-# Fill blanks
 for df in [kaggle_sample, hf_sample]:
     df["soft_skills"] = df["soft_skills"].replace("", "communication, teamwork")
     df["source"] = "Kaggle" if df is kaggle_sample else "HuggingFace"
@@ -191,11 +195,9 @@ hf_map = {
 kaggle_std = normalize(kaggle_sample, kaggle_map)
 hf_std = normalize(hf_sample, hf_map)
 
-# Fill country blanks
 for df in [kaggle_std, hf_std]:
     df["country"] = df["country"].replace("", "United States")
 
-# Normalize salary
 def normalize_salary(x):
     try:
         x = float(str(x).replace(",", "").replace("$", "").strip())
@@ -206,20 +208,27 @@ for df in [kaggle_std, hf_std]:
     df["salary"] = df["salary"].apply(normalize_salary)
 
 combined = pd.concat([kaggle_std, hf_std], ignore_index=True)
-print(f"🧩 Combined final dataset: {combined.shape}")
 
-# ---------- STEP 7: Export Results ----------
+# ---------- ADD MANUAL DATE + RANDOM TIME ----------
+def random_evening_time():
+    hour = random.randint(9, 22)  # 9am to 10pm (22)
+    minute = random.randint(0, 59)
+    second = random.randint(0, 59)
+    return f"{hour:02d}:{minute:02d}:{second:02d}"
+
+combined["job_posted_date"] = [
+    f"{MANUAL_DATE} {random_evening_time()}" for _ in range(len(combined))
+]
+
+print(f"🧩 Combined final dataset: {combined.shape}")
 progress_bar(7, 7)
 
 # ---------- STEP 7: Export Results ----------
-import boto3
+# ---------- STEP 7: Export Results ----------
 from io import StringIO
-from datetime import datetime
 
-# AWS S3 configuration
-bucket_name = "job-skill-analytics"
-timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-file_name = f"fetch_jobs_{timestamp}.csv"
+# Use the MANUAL_DATE in the filename
+file_name = f"fetch_jobs_{MANUAL_DATE}.csv"
 s3_key = f"extract/raw/{file_name}"
 
 # Convert DataFrame to CSV in memory
@@ -227,7 +236,6 @@ csv_buffer = StringIO()
 combined.to_csv(csv_buffer, index=False)
 
 # Upload directly to S3
-s3 = boto3.client("s3")
 s3.put_object(
     Bucket=bucket_name,
     Key=s3_key,
@@ -238,3 +246,4 @@ s3.put_object(
 # Public URL
 public_url = f"https://{bucket_name}.s3.amazonaws.com/{s3_key}"
 print(f"\n✅ Uploaded {len(combined)} jobs → {public_url}")
+print(f"📁 File name: {file_name}")
