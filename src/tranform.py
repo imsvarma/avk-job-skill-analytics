@@ -1,6 +1,7 @@
 # ======================================================
 # 🧹 S3 Transformation Pipeline (Auto Detects Unprocessed Files)
 # Author: Manikanta Sai Varma Indukuri
+# Updated: Oct 2025
 # ======================================================
 
 import boto3
@@ -63,11 +64,45 @@ def infer_job_type(row):
     return ", ".join(sorted(types)) if types else "Not specified"
 
 
+def clean_job_title(title):
+    """Simplify and standardize job titles."""
+    if not isinstance(title, str):
+        return title
+
+    # Lowercase for uniform cleaning
+    t = title.lower()
+
+    # Remove content inside brackets or parentheses
+    t = re.sub(r"\(.*?\)|\[.*?\]|\{.*?\}", "", t)
+
+    # Remove everything after -, #, |, /
+    t = re.split(r"[-#|/]", t)[0]
+
+    # Remove roman numerals (I, II, III, IV, etc.)
+    t = re.sub(r"\b[ivx]+\b", "", t)
+
+    # Remove seniority & unnecessary words
+    t = re.sub(
+        r"\b(senior|sr|junior|jr|lead|principal|chief|head|manager|director|vp|vice president|president|internship|intern|contract|temp|temporary|remote|hybrid|hiring|immediate joiner|via|through)\b",
+        "",
+        t,
+    )
+
+    # Remove special characters and extra spaces
+    t = re.sub(r"[^a-zA-Z\s]", " ", t)
+    t = re.sub(r"\s+", " ", t).strip()
+
+    # Capitalize properly
+    return t.title()
+
+
 def transform_data(df):
     """Perform full cleaning & normalization."""
     # ---- Data type conversions ----
-    df["job_posted_date"] = pd.to_datetime(df["job_posted_date"], errors="coerce")
-    df["salary"] = pd.to_numeric(df["salary"], errors="coerce")
+    if "job_posted_date" in df.columns:
+        df["job_posted_date"] = pd.to_datetime(df["job_posted_date"], errors="coerce")
+    if "salary" in df.columns:
+        df["salary"] = pd.to_numeric(df["salary"], errors="coerce")
 
     # ---- Text cleanup ----
     text_cols = ["company_name", "job_title", "job_type", "job_location", "job_posted_site"]
@@ -75,23 +110,29 @@ def transform_data(df):
         if col in df.columns:
             df[col] = df[col].astype(str).str.strip().str.lower()
 
+    # ---- Clean and simplify job titles ----
+    if "job_title" in df.columns:
+        df["job_title"] = df["job_title"].apply(clean_job_title)
+
     # ---- Infer job type intelligently ----
     df["job_type"] = df.apply(infer_job_type, axis=1)
 
     # ---- Handle missing values ----
     df.fillna({
         "company_name": "Unknown",
-        "technical_skills": "Not listed",
-        "soft_skills": "Not listed"
+        "technical_skills": "not listed",
+        "soft_skills": "not listed"
     }, inplace=True)
 
-    # ---- Parse skills ----
-    df["technical_skills"] = df["technical_skills"].apply(
-        lambda x: [i.strip().lower() for i in x.split(",")] if isinstance(x, str) else []
-    )
-    df["soft_skills"] = df["soft_skills"].apply(
-        lambda x: [i.strip().lower() for i in x.split(",")] if isinstance(x, str) else []
-    )
+    # ---- Parse & flatten skills ----
+    if "technical_skills" in df.columns:
+        df["technical_skills"] = df["technical_skills"].apply(
+            lambda x: ", ".join([i.strip().lower() for i in x.split(",") if i.strip()]) if isinstance(x, str) else "not listed"
+        )
+    if "soft_skills" in df.columns:
+        df["soft_skills"] = df["soft_skills"].apply(
+            lambda x: ", ".join([i.strip().lower() for i in x.split(",") if i.strip()]) if isinstance(x, str) else "not listed"
+        )
 
     # ---- Drop duplicates ----
     df.drop_duplicates(subset=["company_name", "job_title", "job_location", "job_posted_site"], inplace=True)
@@ -101,8 +142,10 @@ def transform_data(df):
         df = df[(df["salary"] >= 20000) & (df["salary"] <= 400000)]
 
     # ---- Derived columns ----
-    df["job_posted_year"] = df["job_posted_date"].dt.year
-    df["city"] = df["job_location"].apply(lambda x: x.split(",")[0] if "," in x else x)
+    if "job_posted_date" in df.columns:
+        df["job_posted_year"] = df["job_posted_date"].dt.year
+    if "job_location" in df.columns:
+        df["city"] = df["job_location"].apply(lambda x: x.split(",")[0].strip() if isinstance(x, str) and "," in x else x)
 
     return df
 
