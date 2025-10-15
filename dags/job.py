@@ -50,8 +50,8 @@ with DAG(
 
     # ---------- TASK 4: Run extract.py ----------
     run_extract = BashOperator(
-        task_id="run_extract_script",
-        bash_command="python /opt/airflow/dags/repo/src/extract.py"
+        task_id="transform",
+        bash_command="python /opt/airflow/dags/repo/src/transform.py"
     )
 
     # ---------- TASK 5: Run load_sqlserver.py ----------
