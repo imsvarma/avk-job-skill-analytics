@@ -69,4 +69,4 @@ with DAG(
     # =========================================================
     # 🔁 TASK ORDER
     # =========================================================
-    check_env >> install_deps >> run_sample_test >> run_extract >> run_load_sqlserver >> post_check
+    check_env >> install_deps >> run_sample_test >> transform >> run_load_sqlserver >> post_check
