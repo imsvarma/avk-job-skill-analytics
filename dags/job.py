@@ -43,13 +43,13 @@ with DAG(
     )
 
     # ---------- TASK 3: Run sample_test.py ----------
-    run_sample_test = BashOperator(
-        task_id="run_sample_test",
-        bash_command="python /opt/airflow/dags/repo/src/sample_test.py"
+    data_extraction = BashOperator(
+        task_id="data_extraction",
+        bash_command="python /opt/airflow/dags/repo/src/data_extract.py"
     )
 
     # ---------- TASK 5: Run load_sqlserver.py ----------
-    run_load_sqlserver = BashOperator(
+    data_load = BashOperator(
         task_id="run_load_sqlserver",
         bash_command="python /opt/airflow/dags/repo/src/load_sqlserver.py"
     )
@@ -64,11 +64,11 @@ with DAG(
     # 🔁 TASK ORDER
     # =========================================================
     # ---------- TASK 4: Run transform.py ----------
-    run_transform = BashOperator(
+    data_transformation = BashOperator(
         task_id="run_transform",
         bash_command="python /opt/airflow/dags/repo/src/transform.py"
     )
 
 
 
-    check_env >> install_deps >> run_sample_test >> run_transform >> run_load_sqlserver >> post_check
+    check_env >> install_deps >>  data_extraction >> data_transformation >> data_load >> post_check
