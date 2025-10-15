@@ -15,13 +15,13 @@ from datetime import datetime, timedelta
 import os
 openai.api_key = os.getenv("OPENAI_API_KEY")  # 🔒 Load key from environment
 
-NUM_JOBS =     1452   # total output size
+NUM_JOBS =     100   # total output size
 KAGGLE_SHARE = 0.82      # 70% Kaggle, 30% HuggingFace
 COUNTRY_FILTER = ["usa", "us", "united states"]
 
 # ---------- MANUAL JOB DATE ----------
 # 👇 Set the desired date here manually
-MANUAL_DATE = "2025-10-11"  # YYYY-MM-DD format
+MANUAL_DATE = "2025-10-12"  # YYYY-MM-DD format
 
 # 💡 In the future, to automatically use today's date, just replace with:
 # MANUAL_DATE = datetime.now().strftime("%Y-%m-%d")
