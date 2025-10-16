@@ -1,7 +1,9 @@
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from datetime import datetime, timedelta
+import pendulum
 
+local_tz = pendulum.timezone("America/New_York")
 # =========================================================
 # ⚙️ Default Configuration
 # =========================================================
@@ -19,8 +21,8 @@ with DAG(
     dag_id="job_pipeline_full_dag",
     default_args=default_args,
     description="Full ETL pipeline running sample_test → extract → load_sqlserver",
-    schedule_interval="@daily",
-    start_date=datetime(2025, 10, 15),
+    schedule_interval="0 9 * * *",  # ✅ every day at 9:00 AM
+    start_date=datetime(2025, 10, 1, tzinfo=local_tz),
     catchup=False,
     tags=["etl", "aws", "sqlserver", "pipeline"]
 ) as dag:
