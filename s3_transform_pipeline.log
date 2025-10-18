@@ -1,0 +1,43 @@
+2025-10-08 12:11:13,130 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 12:11:13,976 - INFO - No new files found.
+2025-10-08 12:14:24,832 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 12:14:25,585 - INFO - No new files found.
+2025-10-08 12:17:49,124 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 12:17:49,868 - INFO - No new files found.
+2025-10-08 12:20:31,148 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 12:20:32,037 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-08_00-16-28_00.csv
+2025-10-08 12:20:32,732 - INFO - \u2705 Uploaded processed file: extract/processed/fetch_jobs_2025-10-08_00-16-28_00.csv
+2025-10-08 12:21:23,739 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 12:21:25,180 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-08_00-16-28_00.csv
+2025-10-08 12:21:26,148 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-08_00-16-28_00.csv
+2025-10-08 13:25:22,785 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 13:25:23,850 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-01.csv
+2025-10-08 13:25:24,632 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-01.csv
+2025-10-08 14:03:21,736 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-08 14:03:22,896 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-02.csv
+2025-10-08 14:03:24,187 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-02.csv
+2025-10-09 20:02:22,657 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-09 20:02:23,716 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-01.csv
+2025-10-09 20:02:24,448 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-01.csv
+2025-10-09 20:02:24,448 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-02.csv
+2025-10-09 20:02:25,027 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-02.csv
+2025-10-09 20:02:25,028 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-03.csv
+2025-10-09 20:02:25,652 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-03.csv
+2025-10-09 20:02:25,652 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-04.csv
+2025-10-09 20:02:26,151 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-04.csv
+2025-10-09 20:02:26,151 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-05.csv
+2025-10-09 20:02:26,570 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-05.csv
+2025-10-09 20:02:26,570 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-06.csv
+2025-10-09 20:02:27,233 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-06.csv
+2025-10-09 20:02:27,233 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-07.csv
+2025-10-09 20:02:27,785 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-07.csv
+2025-10-09 20:02:27,786 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-08.csv
+2025-10-09 20:02:28,268 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-08.csv
+2025-10-09 20:02:28,269 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-09.csv
+2025-10-09 20:02:28,799 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-09.csv
+2025-10-10 13:33:42,870 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-10 13:33:43,890 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-10.csv
+2025-10-10 13:33:45,302 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-10.csv
+2025-10-11 17:19:21,795 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-10-11 17:19:22,945 - INFO - Processing file: extract/raw/fetch_jobs_2025-10-11.csv
+2025-10-11 17:19:23,948 - INFO - \u2705 Uploaded processed file: transformed/fetch_jobs_2025-10-11.csv
