@@ -41,8 +41,6 @@ avk-job-skill-analytics/
 │
 ├── dags/                     # Airflow DAGs for ETL orchestration
 ├── src/                      # Python scripts (extract, transform, load)
-├── sql/                      # SQL scripts (table creation, queries)
-├── data/                     # Example datasets / temporary files
 ├── logs/                     # Airflow and transformation logs
 ├── requirements.txt           # Dependencies
 ├── README.md                  # Project documentation
