@@ -6,6 +6,8 @@ The project automates data flow from extraction to visualization using modern da
 ---
 
 ## 🚀 Project Overview
+<img width="2281" height="1376" alt="Job Market Overview" src="https://github.com/user-attachments/assets/8dab514e-0844-48d6-8f5b-3055ffa7111f" />
+
 
 The goal of this project is to build a **fully automated ETL pipeline** that:
 - Extracts raw job data from multiple public datasets (Kaggle, HuggingFace, etc.)
